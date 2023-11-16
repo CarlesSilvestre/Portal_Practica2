@@ -33,7 +33,6 @@ public class FPSController : MonoBehaviour
     void CheckGrounded()
     {
         isGrounded = characterController.isGrounded;
-        Debug.Log(isGrounded);
     }
     void HandleMovement()
     {

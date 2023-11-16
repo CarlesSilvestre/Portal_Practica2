@@ -2,7 +2,7 @@ Shader "Custom/PortalShader"
 {
     Properties
     {
-        _MainTex ("Albedo (RGB)", 2D) = "white" {}
+        _MainTex ("Texture", 2D) = "white" {}
         _MaskTex("Mask texture", 2D) = "white" {}
         _Cutout("Cutout", Range(0.0, 1.0)) = 0.5
     }
