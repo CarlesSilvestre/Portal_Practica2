@@ -86,8 +86,23 @@ public class Portal : MonoBehaviour
     {
         if (!otherPortal.Set) return;
         Transform go = other.transform;
-        other.gameObject.GetComponent<CharacterController>().enabled = false;
-        go.transform.position = otherPortal.teleport.position + otherPortal.teleport.forward * -1.25f;
-        other.gameObject.GetComponent<CharacterController>().enabled = true;
+        Rigidbody rb = go.GetComponent<Rigidbody>();
+        CharacterController cc = go.GetComponent<CharacterController>();
+
+        Vector3 vel = rb != null ? rb.velocity : Vector3.zero;
+        Vector3 dir = go.forward;
+        Vector3 relativeDir = transform.InverseTransformDirection(dir);
+
+        if (cc != null) 
+            cc.enabled = false;
+        go.transform.position = otherPortal.teleport.position + otherPortal.teleport.forward * -2f;
+        if (cc != null) 
+            cc.enabled = true;
+
+        if (rb != null) 
+            rb.velocity = otherPortal.teleport.TransformDirection(vel);
+        camera.transform.rotation = Quaternion.LookRotation(relativeDir, Vector3.up);
+
+        go.localScale = new Vector3(otherPortal.transform.localScale.x, otherPortal.transform.localScale.y, otherPortal.transform.localScale.z);
     }
 }

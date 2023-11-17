@@ -9,15 +9,16 @@ public class Shooting : MonoBehaviour
     public GameObject OrangePortalObj;
     public Camera camera;
     public float scrollSpeed = 1.0f;
-    public float minScale = 0.1f;
-    public float maxScale = 3.0f;
+    public float minScale = 0.5f;
+    public float maxScale = 2.0f;
 
+    private Transform cube;
     private Portal bluePortal;
     private Portal orangePortal;
-    private bool heldRight;
-    private bool heldLeft;
+    private bool heldRight = false;
+    private bool heldLeft = false;
 
-    private void Start()
+    void Start()
     {
         bluePortal = BluePortalObj.GetComponent<Portal>();
         orangePortal = OrangePortalObj.GetComponent<Portal>();
@@ -28,6 +29,39 @@ public class Shooting : MonoBehaviour
         CheckInputs();
         if (heldLeft) PreviewPortal(bluePortal);
         if (heldRight) PreviewPortal(orangePortal);
+        if(cube != null)
+        {
+            Debug.Log(cube.GetComponent<Rigidbody>().velocity);
+            cube.position = camera.transform.parent.position + camera.transform.parent.forward * 3.5f;
+        }
+    }
+
+
+    private void GravityShoot()
+    {
+        Ray ray = camera.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit) && !hit.collider.CompareTag("Cube"))
+        {
+            return;
+        }
+        if (cube == null)
+        {
+            cube = hit.transform;
+            cube.GetComponent<Rigidbody>().useGravity = false;
+            cube.position = camera.transform.parent.position + camera.transform.parent.forward * 3.5f;
+            //cube.parent = camera.transform.parent;
+        }
+        else
+        {
+            //cube.parent = null;
+            cube.GetComponent<Rigidbody>().useGravity = true;
+            float speed = 12f;
+            Vector3 dir = camera.transform.parent.forward;
+            Vector3 vel = dir * speed;
+            cube.GetComponent<Rigidbody>().velocity = vel;
+            cube = null;
+        }
     }
 
     private void CheckInputs()
@@ -35,6 +69,7 @@ public class Shooting : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && !heldRight)
         {
             heldLeft = true;
+            GravityShoot();
         }
         else if (Input.GetMouseButtonUp(0))
         {
@@ -43,6 +78,12 @@ public class Shooting : MonoBehaviour
         }
         if (Input.GetMouseButtonDown(1) && !heldLeft)
         {
+            if (cube != null)
+            {
+                //cube.parent = null;
+                cube.GetComponent<Rigidbody>().useGravity = true;
+                cube = null;
+            }
             heldRight = true;
         }
         else if (Input.GetMouseButtonUp(1))
@@ -53,12 +94,12 @@ public class Shooting : MonoBehaviour
     }
     private void PreviewPortal(Portal portal)
     {
-        Ray ray = camera.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
-        RaycastHit hit;
 
         float scroll = Input.mouseScrollDelta.y;
         SetScale(scroll, portal);
-        if (Physics.Raycast(ray, out hit))
+        Ray ray = camera.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit) && hit.collider.CompareTag("Pintable") && !hit.collider.CompareTag("Cube"))
         {
             portal.transform.position = hit.point;
             Validate(portal);
@@ -91,12 +132,9 @@ public class Shooting : MonoBehaviour
         Vector3 directionToPoint = (point.position - transform.position).normalized;
         RaycastHit hit;
 
-        if (Physics.Raycast(transform.position, directionToPoint, out hit))
+        if (Physics.Raycast(transform.position, directionToPoint, out hit) && hit.collider.CompareTag("Pintable"))
         {
-            if (hit.collider.CompareTag("Pintable"))
-            {
-                return true;
-            }
+            return true;
         }
 
         return false;
