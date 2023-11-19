@@ -17,7 +17,6 @@ public class Portal : MonoBehaviour
     private MeshRenderer childRend;
     private bool valid = false;
     private bool set = false;
-    private float camera_offset = 0.2f;
 
     public bool Valid { get => valid; set => valid = value; }
     public bool Set { get => set; set => set = value; }
@@ -88,24 +87,33 @@ public class Portal : MonoBehaviour
         if (!otherPortal.Set) return;
         Transform go = other.transform;
         Rigidbody rb = go.GetComponent<Rigidbody>();
-        CharacterController cc = go.GetComponent<CharacterController>();
+        if (other.gameObject.tag.Equals("Cube"))
+        {
+            rb.velocity = Vector3.zero;
+            go.localScale = new Vector3(otherPortal.transform.localScale.x, otherPortal.transform.localScale.y, otherPortal.transform.localScale.z);
+            go.transform.position = otherPortal.transform.position + otherPortal.transform.forward * -((go.localScale.magnitude/3)*2);
+        }
+        else
+        { 
+            
+            CharacterController cc = go.GetComponent<CharacterController>();
+            Vector3 vel = rb != null ? rb.velocity : Vector3.zero;
+            Vector3 dir = go.forward;
+            Vector3 relativeDir = transform.InverseTransformDirection(dir);
 
-        Vector3 vel = rb != null ? rb.velocity : Vector3.zero;
-        Vector3 dir = go.forward;
-        Vector3 relativeDir = transform.InverseTransformDirection(dir);
+            if (cc != null)
+                cc.enabled = false;
+            go.transform.position = otherPortal.teleport.position + otherPortal.teleport.forward * -2f;
+            if (cc != null)
+                cc.enabled = true;
 
-        if (cc != null) 
-            cc.enabled = false;
-        go.transform.position = otherPortal.teleport.position + otherPortal.teleport.forward * -2f;
-        if (cc != null) 
-            cc.enabled = true;
+            if (rb != null)
+                rb.velocity = otherPortal.teleport.TransformDirection(vel);
+            camera.transform.rotation = Quaternion.LookRotation(relativeDir, Vector3.up);
 
-        if (rb != null) 
-            rb.velocity = otherPortal.teleport.TransformDirection(vel);
-        camera.transform.rotation = Quaternion.LookRotation(relativeDir, Vector3.up);
+            GameObject.FindGameObjectWithTag("Player").GetComponent<FPSController>().UpdateLook(Quaternion.LookRotation(-otherPortal.transform.forward));
 
-        GameObject.FindGameObjectWithTag("Player").GetComponent<FPSController>().UpdateLook(Quaternion.LookRotation(-otherPortal.transform.forward));
-
-        go.localScale = new Vector3(otherPortal.transform.localScale.x, otherPortal.transform.localScale.y, otherPortal.transform.localScale.z);
+            go.localScale = new Vector3(otherPortal.transform.localScale.x, otherPortal.transform.localScale.y, otherPortal.transform.localScale.z);
+        }
     }
 }
