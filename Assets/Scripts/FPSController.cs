@@ -13,7 +13,7 @@ public class FPSController : MonoBehaviour
 
     private CharacterController characterController;
     private Transform pitchController;
-    private float pitch = 0.0f;
+    public float pitch = 0.0f;
     private Vector3 velocity;
     private bool isGrounded;
     void Start()
@@ -78,6 +78,11 @@ public class FPSController : MonoBehaviour
             // Apply the jump force
             velocity.y = jumpVelocity;
         }
+    }
+    public void UpdateLook(Quaternion dir)
+    {
+        transform.rotation = dir;
+
     }
 
 

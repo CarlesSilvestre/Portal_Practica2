@@ -17,6 +17,7 @@ public class Portal : MonoBehaviour
     private MeshRenderer childRend;
     private bool valid = false;
     private bool set = false;
+    private float camera_offset = 0.2f;
 
     public bool Valid { get => valid; set => valid = value; }
     public bool Set { get => set; set => set = value; }
@@ -102,6 +103,8 @@ public class Portal : MonoBehaviour
         if (rb != null) 
             rb.velocity = otherPortal.teleport.TransformDirection(vel);
         camera.transform.rotation = Quaternion.LookRotation(relativeDir, Vector3.up);
+
+        GameObject.FindGameObjectWithTag("Player").GetComponent<FPSController>().UpdateLook(Quaternion.LookRotation(-otherPortal.transform.forward));
 
         go.localScale = new Vector3(otherPortal.transform.localScale.x, otherPortal.transform.localScale.y, otherPortal.transform.localScale.z);
     }
