@@ -17,6 +17,7 @@ public class Shooting : MonoBehaviour
     private Portal orangePortal;
     private bool heldRight = false;
     private bool heldLeft = false;
+    public float distance;
 
     void Start()
     {
@@ -32,19 +33,26 @@ public class Shooting : MonoBehaviour
         if(cube != null)
         {
             cube.position = camera.transform.parent.position + camera.transform.parent.forward * 3.5f;
+            if (cube.CompareTag("Turret")){
+                TurretRotation();
+            }
         }
     }
 
+    private void TurretRotation()
+    {
+        cube.transform.rotation = Quaternion.Euler(0, camera.transform.rotation.eulerAngles.y, 0);
+    }
 
     private void GravityShoot()
     {
         Ray ray = camera.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit) && !hit.collider.CompareTag("Cube"))
+        if (Physics.Raycast(ray, out hit) && !hit.collider.CompareTag("Cube")&& !hit.collider.CompareTag("Turret"))
         {
             return;
         }
-        if (cube == null)
+        if (cube == null&& hit.distance<distance)
         {
             cube = hit.transform;
             cube.GetComponent<Rigidbody>().useGravity = false;

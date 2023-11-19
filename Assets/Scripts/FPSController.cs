@@ -84,7 +84,10 @@ public class FPSController : MonoBehaviour
         transform.rotation = dir;
 
     }
-
+    public void Die()
+    {
+        this.enabled = false;
+    }
 
 
 
