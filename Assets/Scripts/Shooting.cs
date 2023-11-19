@@ -31,7 +31,6 @@ public class Shooting : MonoBehaviour
         if (heldRight) PreviewPortal(orangePortal);
         if(cube != null)
         {
-            Debug.Log(cube.GetComponent<Rigidbody>().velocity);
             cube.position = camera.transform.parent.position + camera.transform.parent.forward * 3.5f;
         }
     }
